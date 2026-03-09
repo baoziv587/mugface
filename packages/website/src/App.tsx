@@ -86,9 +86,12 @@ export default function App() {
           <h1 className="fade-up font-display text-6xl md:text-8xl font-bold uppercase tracking-tighter leading-none mb-6">
             Mug<span className="text-accent-1">Face</span>
           </h1>
-          <p className="fade-up text-xl md:text-2xl font-medium mb-10 max-w-xl">
+          <p className="fade-up text-xl md:text-2xl font-medium mb-4 max-w-xl">
             Deterministic SVG avatars generated from any string. Bold,
             expressive, and infinitely scalable.
+          </p>
+          <p className="fade-up text-lg md:text-xl font-medium mb-10 max-w-xl opacity-80">
+            Inspired by <a href="https://github.com/cossistantcom/cossistant/tree/main/packages/facehash" target="_blank" rel="noopener noreferrer" className="underline hover:text-accent-1">FaceHash</a>.
           </p>
           <div className="fade-up bg-text-dark text-text-light p-6 border-l-4 border-accent-1 shadow-xl">
             <pre className="font-mono text-sm md:text-base overflow-x-auto">
