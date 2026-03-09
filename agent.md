@@ -1,0 +1,1 @@
+use bun to run the project
