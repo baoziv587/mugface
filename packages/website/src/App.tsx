@@ -1,8 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { MugFace, type Emotion } from "mugface";
+import { GITHUB_URL, GITHUB_API_URL } from "./constants";
+import { GitHubIcon } from "./components/GitHubIcon";
+import { PropShowcase } from "./components/PropShowcase";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +15,18 @@ export default function App() {
   const [seedValue, setSeedValue] = useState(0);
   const [emotion, setEmotion] = useState<Emotion | "">("");
   const [borderRadius, setBorderRadius] = useState<number | "">("");
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(GITHUB_API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.stargazers_count === "number") {
+          setStars(data.stargazers_count);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch GitHub stars", err));
+  }, []);
 
   useGSAP(
     () => {
@@ -47,6 +62,24 @@ export default function App() {
       ref={container}
       className="bg-bg-primary text-text-dark font-sans selection:bg-accent-1 selection:text-text-light min-h-screen"
     >
+      {/* Top Bar */}
+      <header className=" sticky top-0 left-0 right-0 p-6 flex justify-end z-10 max-w-7xl mx-auto w-full">
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fade-up flex flex-row items-center gap-2 bg-bg-primary border-2 border-text-dark text-text-dark px-4 py-2 font-display font-bold hover:bg-accent-1 hover:text-text-dark transition-all shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(26,26,26,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(26,26,26,1)]"
+        >
+          <GitHubIcon size={20} />
+          Star on GitHub
+          {stars !== null && (
+            <span className="ml-1 px-2 py-0.5 bg-text-dark text-text-light text-xs rounded-full">
+              {stars}
+            </span>
+          )}
+        </a>
+      </header>
+
       {/* Hero Section - Focused on Playground */}
       <section className="pt-20 pb-20 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 min-h-[90vh]">
         <div className="flex-1 w-full text-left">
@@ -162,137 +195,70 @@ export default function App() {
             </p>
           </div>
 
-          {/* Prop: Name */}
-          <div className="prop-section mb-24 border-t border-white/20 pt-16">
-            <div className="mb-10">
-              <h3 className="text-4xl font-display font-bold mb-4 text-accent-1">
-                name
-              </h3>
-              <p className="text-lg opacity-80 font-mono bg-white/10 inline-block px-3 py-1 rounded-sm">
-                type: string (required)
-              </p>
-              <p className="text-xl mt-4 max-w-3xl">
-                The core input string. Every unique string generates a
-                completely unique combination of colors, shapes, and facial
-                features.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {["Alice", "Bob", "Charlie", "Dave"].map((name) => (
-                <div
-                  key={name}
-                  className="prop-card bg-white/5 p-8 border border-white/10 flex flex-col items-center gap-6 hover:bg-white/10 transition-colors"
-                >
-                  <MugFace name={name} className="w-32 h-32 drop-shadow-lg" />
-                  <code className="font-mono text-lg font-bold">
-                    name="{name}"
-                  </code>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PropShowcase
+            title="name"
+            type="type: string (required)"
+            description="The core input string. Every unique string generates a completely unique combination of colors, shapes, and facial features."
+            values={["Alice", "Bob", "Charlie", "Dave"]}
+            renderCode={(name) => `name="${name}"`}
+            renderAvatar={(name) => <MugFace name={name} className="w-32 h-32 drop-shadow-lg" />}
+            accentColor="text-accent-1"
+          />
 
-          {/* Prop: Seed */}
-          <div className="prop-section mb-24 border-t border-white/20 pt-16">
-            <div className="mb-10">
-              <h3 className="text-4xl font-display font-bold mb-4 text-accent-2">
-                seed
-              </h3>
-              <p className="text-lg opacity-80 font-mono bg-white/10 inline-block px-3 py-1 rounded-sm">
-                type: number (default: 0)
-              </p>
-              <p className="text-xl mt-4 max-w-3xl">
-                Provides variations for the exact same name. Useful if you want
-                to keep the username but cycle through different avatar looks.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {[0, 1, 42, 99].map((seed) => (
-                <div
-                  key={seed}
-                  className="prop-card bg-white/5 p-8 border border-white/10 flex flex-col items-center gap-6 hover:bg-white/10 transition-colors"
-                >
-                  <MugFace
-                    name="MugFace"
-                    seed={seed}
-                    className="w-32 h-32 drop-shadow-lg"
-                  />
-                  <code className="font-mono text-lg font-bold">
-                    seed={`{${seed}}`}
-                  </code>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PropShowcase
+            title="seed"
+            type="type: number (default: 0)"
+            description="Provides variations for the exact same name. Useful if you want to keep the username but cycle through different avatar looks."
+            values={[0, 1, 42, 99]}
+            renderCode={(seed) => `seed={${seed}}`}
+            renderAvatar={(seed) => <MugFace name="MugFace" seed={seed} className="w-32 h-32 drop-shadow-lg" />}
+            accentColor="text-accent-2"
+          />
 
-          {/* Prop: Emotion */}
-          <div className="prop-section mb-24 border-t border-white/20 pt-16">
-            <div className="mb-10">
-              <h3 className="text-4xl font-display font-bold mb-4 text-accent-1">
-                emotion
-              </h3>
-              <p className="text-lg opacity-80 font-mono bg-white/10 inline-block px-3 py-1 rounded-sm">
-                type: 'neutral' | 'happy' | 'sad' | 'anxious'
-              </p>
-              <p className="text-xl mt-4 max-w-3xl">
-                Overrides the randomly hashed expression to force a specific
-                emotional state while maintaining the user's unique colors and
-                shapes.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {["neutral", "happy", "sad", "anxious"].map((em) => (
-                <div
-                  key={em}
-                  className="prop-card bg-white/5 p-8 border border-white/10 flex flex-col items-center gap-6 hover:bg-white/10 transition-colors"
-                >
-                  <MugFace
-                    name="MugFace"
-                    emotion={em as Emotion}
-                    className="w-32 h-32 drop-shadow-lg"
-                  />
-                  <code className="font-mono text-lg font-bold">
-                    emotion="{em}"
-                  </code>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PropShowcase
+            title="emotion"
+            type="type: 'neutral' | 'happy' | 'sad' | 'anxious'"
+            description="Overrides the randomly hashed expression to force a specific emotional state while maintaining the user's unique colors and shapes."
+            values={["neutral", "happy", "sad", "anxious"] as Emotion[]}
+            renderCode={(em) => `emotion="${em}"`}
+            renderAvatar={(em) => <MugFace name="MugFace" emotion={em} className="w-32 h-32 drop-shadow-lg" />}
+            accentColor="text-accent-1"
+          />
 
-          {/* Prop: BorderRadius */}
-          <div className="prop-section border-t border-white/20 pt-16 pb-16">
-            <div className="mb-10">
-              <h3 className="text-4xl font-display font-bold mb-4 text-accent-2">
-                borderRadius
-              </h3>
-              <p className="text-lg opacity-80 font-mono bg-white/10 inline-block px-3 py-1 rounded-sm">
-                type: number (0 - 50)
-              </p>
-              <p className="text-xl mt-4 max-w-3xl">
-                Overrides the randomly hashed background shape. 0 creates a
-                perfect square, 50 creates a perfect circle.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {[0, 15, 30, 50].map((radius) => (
-                <div
-                  key={radius}
-                  className="prop-card bg-white/5 p-8 border border-white/10 flex flex-col items-center gap-6 hover:bg-white/10 transition-colors"
-                >
-                  <MugFace
-                    name="MugFace"
-                    borderRadius={radius}
-                    className="w-32 h-32 drop-shadow-lg"
-                  />
-                  <code className="font-mono text-lg font-bold">
-                    borderRadius={`{${radius}}`}
-                  </code>
-                </div>
-              ))}
-            </div>
-          </div>
+            <PropShowcase
+              title="borderRadius"
+              type="type: number (0 - 50)"
+              description="Overrides the randomly hashed background shape. 0 creates a perfect square, 50 creates a perfect circle."
+              values={[0, 15, 30, 50]}
+              renderCode={(radius) => `borderRadius={${radius}}`}
+              renderAvatar={(radius) => <MugFace name="MugFace" borderRadius={radius} className="w-32 h-32 drop-shadow-lg" />}
+              accentColor="text-accent-2"
+            />
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-bg-primary text-text-dark py-12 px-6 border-t-4 border-text-dark">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="font-display font-bold text-2xl uppercase tracking-tighter">
+            Mug<span className="text-accent-1">Face</span>
+          </div>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-text-dark text-text-light border-2 border-text-dark px-6 py-3 font-display font-bold hover:bg-accent-1 hover:text-text-dark transition-all shadow-[6px_6px_0px_0px_rgba(26,26,26,1)] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(26,26,26,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] text-lg"
+          >
+            <GitHubIcon size={24} />
+            Star on GitHub
+            {stars !== null && (
+              <span className="ml-2 px-2 py-0.5 bg-bg-primary text-text-dark text-sm rounded-full">
+                {stars}
+              </span>
+            )}
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

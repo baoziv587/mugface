@@ -266,10 +266,10 @@ export const MugFace: React.FC<MugFaceProps> = ({
           `}
         </style>
       )}
-      <g className={animate ? "face-group" : ""}>
+      <g className={animate && "face-group"}>
         {Shape(palette.bg)}
         {Cheek()}
-        <g className={animate ? "face-eyes" : ""}>{Eye(palette.fg)}</g>
+        <g className={animate && "face-eyes"}>{Eye(palette.fg)}</g>
         {Mouth(palette.fg)}
       </g>
     </svg>
